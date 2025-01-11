@@ -1,17 +1,17 @@
-# Pizza Store API
+# Charity Fundraising DBMS API
 
 ## Setup Instructions
 
 1. Create a new web project:
 
     ```bash
-    dotnet new web -o PizzaStore -f net8.0  # You can change 'PizzaStore' to your preferred project name
+    dotnet new web -o Charity_Fundraising_DBMS -f net8.0
     ```
 
 2. Install required packages:
 
     ```bash
-    cd PizzaStore  # Make sure you're in your project directory
+    cd Charity_Fundraising_DBMS  # Make sure you're in your project directory
     dotnet add package Microsoft.EntityFrameworkCore.sqlserver
     dotnet add package Microsoft.EntityFrameworkCore.Sqlite 
     dotnet add package Microsoft.EntityFrameworkCore.Design
@@ -32,9 +32,9 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
      c.SwaggerDoc("v1", new OpenApiInfo { 
-         Title = "PizzaStore API",            // Customize your API title
-         Description = "Making the Pizzas you love",  // Add your API description
-         Version = "v1"                       // Change version as needed
+         Title = "Charity Fundraising DBMS API",          
+         Description = "Managing charity fundraising and distribution",  
+         Version = "v1"                     
      });
 });
     
@@ -45,11 +45,11 @@ if (app.Environment.IsDevelopment())
    app.UseSwagger();
    app.UseSwaggerUI(c =>
    {
-      c.SwaggerEndpoint("/swagger/v1/swagger.json", "PizzaStore API V1");
+      c.SwaggerEndpoint("/swagger/v1/swagger.json", "Charity Fundraising DBMS API V1");
    });
 }
     
-app.MapGet("/", () => "Hello World!");
+app.MapGet("/", () => "Welcome to Charity Fundraising DBMS!");
     
 app.Run();
 ```
@@ -59,5 +59,5 @@ app.Run();
 To scaffold your database context, run:
 
 ```bash
-dotnet ef dbcontext scaffold "Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=Chinook" Microsoft.EntityFrameworkCore.SqlServer
+dotnet ef dbcontext scaffold "Server=(localdb)\MSSQLLocalDB;Database=Charity_Fundraising_DBMS;Trusted_Connection=True;" Microsoft.EntityFrameworkCore.SqlServer
 ```
