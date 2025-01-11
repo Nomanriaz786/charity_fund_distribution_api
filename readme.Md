@@ -6,12 +6,12 @@
 
     ```bash
     dotnet new web -o Charity_Fundraising_DBMS -f net8.0
+    cd Charity_Fundraising_DBMS  # Make sure you're in your project directory
     ```
 
 2. Install required packages:
 
     ```bash
-    cd Charity_Fundraising_DBMS  # Make sure you're in your project directory
     dotnet add package Microsoft.EntityFrameworkCore.sqlserver
     dotnet add package Microsoft.EntityFrameworkCore.Sqlite 
     dotnet add package Microsoft.EntityFrameworkCore.Design
