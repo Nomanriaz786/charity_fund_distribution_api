@@ -20,9 +20,9 @@ public partial class Campaign
 
     public string CStatus { get; set; } = null!;
 
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonIgnore]
     public virtual ICollection<Donation>? Donations { get; set; } = new List<Donation>();
 
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonIgnore]
     public virtual ICollection<FundDistribution>? FundDistributions { get; set; } = new List<FundDistribution>();
 }

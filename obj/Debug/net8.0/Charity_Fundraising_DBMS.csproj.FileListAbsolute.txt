@@ -193,3 +193,4 @@ C:\Users\User\Charity_Fundraising_DBMS\obj\Debug\net8.0\Charity_Fundraising_DBMS
 C:\Users\User\Charity_Fundraising_DBMS\obj\Debug\net8.0\Charity_Fundraising_DBMS.genruntimeconfig.cache
 C:\Users\User\Charity_Fundraising_DBMS\obj\Debug\net8.0\ref\Charity_Fundraising_DBMS.dll
 C:\Users\User\Charity_Fundraising_DBMS\bin\Debug\net8.0\Microsoft.AspNetCore.OpenApi.dll
+C:\Users\User\Charity_Fundraising_DBMS\obj\Debug\net8.0\Charity_Fundraising_DBMS.sourcelink.json

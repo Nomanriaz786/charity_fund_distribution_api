@@ -1,12 +1,12 @@
 using Charity_Fundraising_DBMS;
+using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 
-public class API_Functions
+public static class API_Functions
 {
-    private readonly CharityFundraisingDbmsContext db = new();
+    private static readonly CharityFundraisingDbmsContext db = new();
 
-    public record OperationResult(bool Success, string Message = "");
-
-    public OperationResult AddCampaign(Campaign campaign)
+    public static IResult AddCampaign(Campaign campaign)
     {
         try
         {
@@ -15,221 +15,368 @@ public class API_Functions
             
             db.Campaigns.Add(campaign);
             db.SaveChanges();
-            return new OperationResult(true);
+            return Results.Created($"/campaigns/{campaign.CampaignId}", campaign);
         }
         catch (Exception ex)
         {
-            return new OperationResult(false, $"Failed to add campaign: {ex.Message}");
+            return Results.BadRequest($"Failed to add campaign: {ex.Message}");
         }
     }
     // display all campaigns
-    public List<Campaign> GetCampaigns() => db.Campaigns.ToList();
+    public static IResult GetCampaigns()
+    {
+        var campaigns = db.Campaigns.ToList();
+        return Results.Ok(campaigns);
+    } 
+    // update the campaign
+     public static IResult UpdateCampaign(int campaignId, Campaign updatedCampaign)
+    {
+        try
+        {
+            // Ensure the CampaignId is set correctly
+            if (campaignId != updatedCampaign.CampaignId)
+                return Results.BadRequest("Campaign ID mismatch");
+
+            // Retrieve the existing campaign without tracking it
+            var existingCampaign = db.Campaigns.AsNoTracking().FirstOrDefault(c => c.CampaignId == campaignId);
+            if (existingCampaign == null)
+                return Results.NotFound("Campaign not found");
+
+            // Attach the updated entity to the context
+            db.Campaigns.Attach(updatedCampaign);
+            db.Entry(updatedCampaign).State = EntityState.Modified;
+
+            // Save changes to the database
+            db.SaveChanges();
+            return Results.NoContent();
+        }
+        catch (Exception ex)
+        {
+            return Results.BadRequest($"Failed to update campaign: {ex.Message}");
+        }
+    }
     // Delete the campaign
-    public OperationResult DeleteCampaign(int campaignId)
+    public static IResult DeleteCampaign(int campaignId)
     {
         try
         {
             var campaign = db.Campaigns.Find(campaignId);
             if (campaign == null)
-                return new OperationResult(false, "Campaign not found");
+                return Results.NotFound("Campaign not found");
 
             db.Campaigns.Remove(campaign);
             db.SaveChanges();
-            return new OperationResult(true);
+            return Results.NoContent();
         }
         catch (Exception ex)
         {
-            return new OperationResult(false, $"Failed to delete campaign: {ex.Message}");
+            return Results.BadRequest($"Failed to delete campaign: {ex.Message}");
         }
     }
     // Add a donation
-    public OperationResult AddDonation(Donation donation)
+    public static IResult AddDonation(Donation donation)
     {
         try
         {
+            if (donation == null)
+                return Results.BadRequest("Invalid donation data");
             db.Donations.Add(donation);
             db.SaveChanges();
-            return new OperationResult(true);
+            return Results.Created($"/donations/{donation.DonationId}", donation);
         }
         catch (Exception ex)
         {
-            return new OperationResult(false, $"Failed to add donation: {ex.Message}");
+            return Results.BadRequest($"Failed to add donation: {ex.Message}");
         }
     }
     // Display all donations
-    public List<Donation> GetDonations() => db.Donations.ToList();
+    public static IResult GetDonations()
+    {
+        var donations = db.Donations.ToList();
+        return Results.Ok(donations);
+    }
     // Delete a donation
-    public OperationResult DeleteDonation(int donationId)
+    public static IResult DeleteDonation(int donationId)
     {
         try
         {
             var donation = db.Donations.Find(donationId);
             if (donation == null)
-                return new OperationResult(false, "Donation not found");
+                return Results.NotFound("Donation not found");
 
             db.Donations.Remove(donation);
             db.SaveChanges();
-            return new OperationResult(true);
+            return Results.NoContent();
         }
         catch (Exception ex)
         {
-            return new OperationResult(false, $"Failed to delete donation: {ex.Message}");
+            return Results.BadRequest($"Failed to delete donation: {ex.Message}");
         }
     }
     // Add a donor
-    public OperationResult AddDonor(Donor donor)
+    public static IResult AddDonor(Donor donor)
     {
         try
         {
+            if (donor == null)
+                return Results.BadRequest("Invalid donor data");
             db.Donors.Add(donor);
             db.SaveChanges();
-            return new OperationResult(true);
+            return Results.Created($"/donors/{donor.DonorId}", donor);
         }
         catch (Exception ex)
         {
-            return new OperationResult(false, $"Failed to add donor: {ex.Message}");
+            return Results.BadRequest($"Failed to add donor: {ex.Message}");
         }
     }
     // Display all donors
-    public List<Donor> GetDonors() => db.Donors.ToList();
+    public static IResult GetDonors()
+    {
+        var donors = db.Donors.ToList();
+        return Results.Ok(donors);
+    }
     // Delete a donor
-    public OperationResult DeleteDonor(int donorId)
+    public static IResult DeleteDonor(int donorId)
     {
         try
         {
             var donor = db.Donors.Find(donorId);
             if (donor == null)
-                return new OperationResult(false, "Donor not found");
+                return Results.NotFound("Donor not found");
 
             db.Donors.Remove(donor);
             db.SaveChanges();
-            return new OperationResult(true);
+            return Results.NoContent();
         }
         catch (Exception ex)
         {
-            return new OperationResult(false, $"Failed to delete donor: {ex.Message}");
+            return Results.BadRequest($"Failed to delete donor: {ex.Message}");
         }
     }
     // Add a fund distribution
-    public OperationResult AddFundDistribution(FundDistribution fundDistribution)
+    public static IResult AddFundDistribution(FundDistribution fundDistribution)
     {
         try
         {
+            if (fundDistribution == null)
+                return Results.BadRequest("Invalid fund distribution data");
             db.FundDistributions.Add(fundDistribution);
             db.SaveChanges();
-            return new OperationResult(true);
+            return Results.Created($"/funddistributions/{fundDistribution.DistributionId}", fundDistribution);
         }
         catch (Exception ex)
         {
-            return new OperationResult(false, $"Failed to add fund distribution: {ex.Message}");
+            return Results.BadRequest($"Failed to add fund distribution: {ex.Message}");
         }
     }
     // Display all fund distributions
-    public List<FundDistribution> GetFundDistributions() => db.FundDistributions.ToList();
+    public static IResult GetFundDistributions()
+    {
+        var distributions = db.FundDistributions.ToList();
+        return Results.Ok(distributions);
+    }
     // Delete a fund distribution
-    public OperationResult DeleteFundDistribution(int distributionId)
+    public static IResult DeleteFundDistribution(int distributionId)
     {
         try
         {
             var fundDistribution = db.FundDistributions.Find(distributionId);
             if (fundDistribution == null)
-                return new OperationResult(false, "Fund distribution not found");
+                return Results.NotFound("Fund distribution not found");
 
             db.FundDistributions.Remove(fundDistribution);
             db.SaveChanges();
-            return new OperationResult(true);
+            return Results.NoContent();
         }
         catch (Exception ex)
         {
-            return new OperationResult(false, $"Failed to delete fund distribution: {ex.Message}");
+            return Results.BadRequest($"Failed to delete fund distribution: {ex.Message}");
         }
     }
-    // update the campaign
-    public OperationResult UpdateCampaign(Campaign campaign)
-    {
-        try
-        {
-            db.Campaigns.Update(campaign);
-            db.SaveChanges();
-            return new OperationResult(true);
-        }
-        catch (Exception ex)
-        {
-            return new OperationResult(false, $"Failed to update campaign: {ex.Message}");
-        }
-    }
+    
     // update the donation
-    public OperationResult UpdateDonation(Donation donation)
+    public static IResult UpdateDonation(int donationId, Donation updatedDonation)
     {
         try
         {
-            db.Donations.Update(donation);
+            // Ensure the DonationId is set correctly
+            if (donationId != updatedDonation.DonationId)
+                return Results.BadRequest("Donation ID mismatch");
+
+            // Retrieve the existing donation without tracking it
+            var existingDonation = db.Donations.AsNoTracking().FirstOrDefault(d => d.DonationId == donationId);
+            if (existingDonation == null)
+                return Results.NotFound("Donation not found");
+
+            // Attach the updated entity to the context
+            db.Donations.Attach(updatedDonation);
+            db.Entry(updatedDonation).State = EntityState.Modified;
+
+            // Save changes to the database
             db.SaveChanges();
-            return new OperationResult(true);
+            return Results.NoContent();
         }
         catch (Exception ex)
         {
-            return new OperationResult(false, $"Failed to update donation: {ex.Message}");
+            return Results.BadRequest($"Failed to update donation: {ex.Message}");
         }
     }
     // update the donor
-    public OperationResult UpdateDonor(Donor donor)
+    public static IResult UpdateDonor(int donorId, Donor updatedDonor)
     {
         try
         {
-            db.Donors.Update(donor);
+            // Ensure the DonorId is set correctly
+            if (donorId != updatedDonor.DonorId)
+                return Results.BadRequest("Donor ID mismatch");
+
+            // Retrieve the existing donor without tracking it
+            var existingDonor = db.Donors.AsNoTracking().FirstOrDefault(d => d.DonorId == donorId);
+            if (existingDonor == null)
+                return Results.NotFound("Donor not found");
+
+            // Attach the updated entity to the context
+            db.Donors.Attach(updatedDonor);
+            db.Entry(updatedDonor).State = EntityState.Modified;
+
+            // Save changes to the database
             db.SaveChanges();
-            return new OperationResult(true);
+            return Results.NoContent();
         }
         catch (Exception ex)
         {
-            return new OperationResult(false, $"Failed to update donor: {ex.Message}");
+            return Results.BadRequest($"Failed to update donor: {ex.Message}");
         }
     }
     // update the fund distribution
-    public OperationResult UpdateFundDistribution(FundDistribution fundDistribution)
+    public static IResult UpdateFundDistribution(int distributionId, FundDistribution updatedFundDistribution)
     {
         try
         {
-            db.FundDistributions.Update(fundDistribution);
+            // Ensure the DistributionId is set correctly
+            if (distributionId != updatedFundDistribution.DistributionId)
+                return Results.BadRequest("Distribution ID mismatch");
+
+            // Retrieve the existing fund distribution without tracking it
+            var existingFundDistribution = db.FundDistributions.AsNoTracking().FirstOrDefault(fd => fd.DistributionId == distributionId);
+            if (existingFundDistribution == null)
+                return Results.NotFound("Fund distribution not found");
+
+            // Attach the updated entity to the context
+            db.FundDistributions.Attach(updatedFundDistribution);
+            db.Entry(updatedFundDistribution).State = EntityState.Modified;
+
+            // Save changes to the database
             db.SaveChanges();
-            return new OperationResult(true);
+            return Results.NoContent();
         }
         catch (Exception ex)
         {
-            return new OperationResult(false, $"Failed to update fund distribution: {ex.Message}");
+            return Results.BadRequest($"Failed to update fund distribution: {ex.Message}");
         }
     }
     // Get a campaign by ID
-    public Campaign GetCampaignById(int campaignId) => db.Campaigns.Find(campaignId) ?? new Campaign();
+    public static IResult GetCampaignById(int campaignId)
+    {
+        var campaign = db.Campaigns.Find(campaignId);
+        return campaign == null ? Results.NotFound("Campaign not found") : Results.Ok(campaign);
+    }
     // Get a donation by ID
-    public Donation GetDonationById(int donationId) => db.Donations.Find(donationId)!;
+    public static IResult GetDonationById(int donationId)
+    {
+        var donation = db.Donations.Find(donationId);
+        return donation == null ? Results.NotFound("Donation not found") : Results.Ok(donation);
+    }
     // Get a donor by ID
-    public Donor GetDonorById(int donorId) => db.Donors.Find(donorId)!;
+    public static IResult GetDonorById(int donorId)
+    {
+        var donor = db.Donors.Find(donorId);
+        return donor == null ? Results.NotFound("Donor not found") : Results.Ok(donor);
+    }
     // Get a fund distribution by ID
-    public FundDistribution GetFundDistributionById(int distributionId) => db.FundDistributions.Find(distributionId) ?? new FundDistribution();
+    public static IResult GetFundDistributionById(int distributionId)
+    {
+        var distribution = db.FundDistributions.Find(distributionId);
+        return distribution == null ? Results.NotFound("Fund distribution not found") : Results.Ok(distribution);
+    }
     // Get all donations for a campaign
-    public List<Donation> GetDonationsForCampaign(int campaignId) => db.Donations.Where(d => d.CampaignId == campaignId).ToList();
+    public static IResult GetDonationsForCampaign(int campaignId)
+    {
+        var donations = db.Donations.Where(d => d.CampaignId == campaignId).ToList();
+        return donations.Any() ? Results.Ok(donations) : Results.NotFound("No donations found for this campaign");
+    }
     // Get all fund distributions for a campaign
-    public List<FundDistribution> GetFundDistributionsForCampaign(int campaignId) => db.FundDistributions.Where(f => f.CampaignId == campaignId).ToList();
+    public static IResult GetFundDistributionsForCampaign(int campaignId)
+    {
+        var distributions = db.FundDistributions.Where(f => f.CampaignId == campaignId).ToList();
+        return distributions.Any() ? Results.Ok(distributions) : Results.NotFound("No distributions found for this campaign");
+    }
     // Get all donations for a donor
-    public List<Donation> GetDonationsForDonor(int donorId) => db.Donations.Where(d => d.DonorId == donorId).ToList();
+    public static IResult GetDonationsForDonor(int donorId)
+    {
+        var donations = db.Donations.Where(d => d.DonorId == donorId).ToList();
+        return donations.Any() ? Results.Ok(donations) : Results.NotFound("No donations found for this donor");
+    }
+
     // Get all fund distributions for a beneficiary
-    public List<FundDistribution> GetFundDistributionsForBeneficiary(string beneficiaryName) => db.FundDistributions.Where(f => f.FBeneficiaryName == beneficiaryName).ToList();
+    public static IResult GetFundDistributionsForBeneficiary(string beneficiaryName)
+    {
+        var distributions = db.FundDistributions.Where(f => f.FBeneficiaryName == beneficiaryName).ToList();
+        return distributions.Any() ? Results.Ok(distributions) : Results.NotFound("No distributions found for this beneficiary");
+    }
+
     // Get all fund distributions for a campaign and beneficiary
-    public List<FundDistribution> GetFundDistributionsForCampaignAndBeneficiary(int campaignId, string beneficiaryName) => db.FundDistributions.Where(f => f.CampaignId == campaignId && f.FBeneficiaryName == beneficiaryName).ToList();
+    public static IResult GetFundDistributionsForCampaignAndBeneficiary(int campaignId, string beneficiaryName)
+    {
+        var distributions = db.FundDistributions
+            .Where(f => f.CampaignId == campaignId && f.FBeneficiaryName == beneficiaryName)
+            .ToList();
+        return distributions.Any() ? Results.Ok(distributions) : Results.NotFound("No distributions found");
+    }
+
     // Get the total amount donated for a campaign
-    public decimal GetTotalDonationsForCampaign(int campaignId) => db.Donations.Where(d => d.CampaignId == campaignId).Sum(d => d.DAmount);
+    public static IResult GetTotalDonationsForCampaign(int campaignId)
+    {
+        var total = db.Donations.Where(d => d.CampaignId == campaignId).Sum(d => d.DAmount);
+        return Results.Ok(total);
+    }
+
     // Get the total amount distributed for a campaign
-    public decimal GetTotalDistributionsForCampaign(int campaignId) => db.FundDistributions.Where(f => f.CampaignId == campaignId).Sum(f => f.FAmountDistributed);
+    public static IResult GetTotalDistributionsForCampaign(int campaignId)
+    {
+        var total = db.FundDistributions.Where(f => f.CampaignId == campaignId).Sum(f => f.FAmountDistributed);
+        return Results.Ok(total);
+    }
+
     // Get the total amount donated by a donor
-    public decimal GetTotalDonationsForDonor(int donorId) => db.Donations.Where(d => d.DonorId == donorId).Sum(d => d.DAmount);
+    public static IResult GetTotalDonationsForDonor(int donorId)
+    {
+        var total = db.Donations.Where(d => d.DonorId == donorId).Sum(d => d.DAmount);
+        return Results.Ok(total);
+    }
+
     // Get the total amount distributed to a beneficiary
-    public decimal GetTotalDistributionsForBeneficiary(string beneficiaryName) => db.FundDistributions.Where(f => f.FBeneficiaryName == beneficiaryName).Sum(f => f.FAmountDistributed);
+    public static IResult GetTotalDistributionsForBeneficiary(string beneficiaryName)
+    {
+        var total = db.FundDistributions.Where(f => f.FBeneficiaryName == beneficiaryName).Sum(f => f.FAmountDistributed);
+        return Results.Ok(total);
+    }
+
     // Get the total amount distributed to a beneficiary for a campaign
-    public decimal GetTotalDistributionsForCampaignAndBeneficiary(int campaignId, string beneficiaryName) => db.FundDistributions.Where(f => f.CampaignId == campaignId && f.FBeneficiaryName == beneficiaryName).Sum(f => f.FAmountDistributed);
+    public static IResult GetTotalDistributionsForCampaignAndBeneficiary(int campaignId, string beneficiaryName)
+    {
+        var total = db.FundDistributions
+            .Where(f => f.CampaignId == campaignId && f.FBeneficiaryName == beneficiaryName)
+            .Sum(f => f.FAmountDistributed);
+        return Results.Ok(total);
+    }
+
     // Get the total amount donated for a campaign by a donor
-    public decimal GetTotalDonationsForCampaignAndDonor(int campaignId, int donorId) => db.Donations.Where(d => d.CampaignId == campaignId && d.DonorId == donorId).Sum(d => d.DAmount);
-    
-    
+    public static IResult GetTotalDonationsForCampaignAndDonor(int campaignId, int donorId)
+    {
+        var total = db.Donations
+            .Where(d => d.CampaignId == campaignId && d.DonorId == donorId)
+            .Sum(d => d.DAmount);
+        return Results.Ok(total);
+    }
 }

@@ -30,358 +30,92 @@ if (app.Environment.IsDevelopment())
    });
 }
 app.MapGet("/", () => "Hello World!");
+
 // Display all campaigns
-app.MapGet("/campaigns", () => {
-    var api = new API_Functions();
-    return Results.Ok(api.GetCampaigns());
-});
+app.MapGet("/campaigns", () => API_Functions.GetCampaigns());
 // Add a campaign
-app.MapPost("/campaigns", (Campaign campaign) =>
-{
-    if (campaign == null)
-        return Results.BadRequest("Invalid campaign data");
-
-    var api = new API_Functions();
-    var result = api.AddCampaign(campaign);
-
-    return result.Success
-        ? Results.Created($"/campaigns/{campaign.CampaignId}", campaign)
-        : Results.BadRequest(result.Message);
-})
-.Produces<Campaign>(StatusCodes.Status201Created)
-.Produces(StatusCodes.Status400BadRequest)
-.WithName("CreateCampaign")
-.WithOpenApi();
-app.MapDelete("/campaigns/{campaignId}", (int campaignId) =>
-{
-    var api = new API_Functions();
-    var result = api.DeleteCampaign(campaignId);
-
-    return result.Success
-        ? Results.NoContent()
-        : Results.BadRequest(result.Message);
-});
+app.MapPost("/campaigns", (Campaign campaign) => API_Functions.AddCampaign(campaign));
+// Update the campaign
+app.MapPut("/campaigns/{campaignId}", (int campaignId, Campaign campaign) => 
+    API_Functions.UpdateCampaign(campaignId, campaign));
+// Delete the campaign
+app.MapDelete("/campaigns/{campaignId}", (int campaignId) => API_Functions.DeleteCampaign(campaignId));
 // Add a donation
-app.MapPost("/donations", (Donation donation) =>
-{
-    if (donation == null)
-        return Results.BadRequest("Invalid donation data");
-
-    var api = new API_Functions();
-    var result = api.AddDonation(donation);
-
-    return result.Success
-        ? Results.Created($"/donations/{donation.DonationId}", donation)
-        : Results.BadRequest(result.Message);
-})
-.Produces<Donation>(StatusCodes.Status201Created)
-.Produces(StatusCodes.Status400BadRequest)
-.WithName("CreateDonation")
-.WithOpenApi();
+app.MapPost("/donations", (Donation donation) => API_Functions.AddDonation(donation));
 // Display all donations
-app.MapGet("/donations", () => {
-    var api = new API_Functions();
-    return Results.Ok(api.GetDonations());
-});
+app.MapGet("/donations", () => API_Functions.GetDonations());
+// Update the donation
+app.MapPut("/donations/{donationId}", (int donationId, Donation donation) => 
+    API_Functions.UpdateDonation(donationId, donation));
 // Delete the donation
-app.MapDelete("/donations/{donationId}", (int donationId) =>
-{
-    var api = new API_Functions();
-    var result = api.DeleteDonation(donationId);
-
-    return result.Success
-        ? Results.NoContent()
-        : Results.BadRequest(result.Message);
-});
+app.MapDelete("/donations/{donationId}", (int donationId) => 
+    API_Functions.DeleteDonation(donationId));
 // Add a fund distribution
 app.MapPost("/fund-distributions", (FundDistribution fundDistribution) =>
-{
-    if (fundDistribution == null)
-        return Results.BadRequest("Invalid fund distribution data");
-
-    var api = new API_Functions();
-    var result = api.AddFundDistribution(fundDistribution);
-
-    return result.Success
-        ? Results.Created($"/fund-distributions/{fundDistribution.DistributionId}", fundDistribution)
-        : Results.BadRequest(result.Message);
-})
-.Produces<FundDistribution>(StatusCodes.Status201Created)
-.Produces(StatusCodes.Status400BadRequest)
-.WithName("CreateFundDistribution")
-.WithOpenApi();
+    API_Functions.AddFundDistribution(fundDistribution));
 // Display all fund distributions
-app.MapGet("/fund-distributions", () => {
-    var api = new API_Functions();
-    return Results.Ok(api.GetFundDistributions());
-});
+app.MapGet("/fund-distributions", () => API_Functions.GetFundDistributions());
+// Update the fund distribution
+app.MapPut("/fund-distributions/{distributionId}", (int distributionId, FundDistribution distribution) => 
+    API_Functions.UpdateFundDistribution(distributionId, distribution));
 // Delete the fund distribution
-app.MapDelete("/fund-distributions/{distributionId}", (int distributionId) =>
-{
-    var api = new API_Functions();
-    var result = api.DeleteFundDistribution(distributionId);
-
-    return result.Success
-        ? Results.NoContent()
-        : Results.BadRequest(result.Message);
-});
+app.MapDelete("/fund-distributions/{distributionId}", (int distributionId) => API_Functions.DeleteFundDistribution(distributionId));
 // Add a donor
-app.MapPost("/donors", (Donor donor) =>
-{
-    if (donor == null)
-        return Results.BadRequest("Invalid donor data");
-
-    var api = new API_Functions();
-    var result = api.AddDonor(donor);
-
-    return result.Success
-        ? Results.Created($"/donors/{donor.DonorId}", donor)
-        : Results.BadRequest(result.Message);
-})
-.Produces<Donor>(StatusCodes.Status201Created)
-.Produces(StatusCodes.Status400BadRequest)
-.WithName("CreateDonor")
-.WithOpenApi();
+app.MapPost("/donors", (Donor donor) => API_Functions.AddDonor(donor));
 // Display all donors
-app.MapGet("/donors", () => {
-    var api = new API_Functions();
-    return Results.Ok(api.GetDonors());
-});
+app.MapGet("/donors", () => API_Functions.GetDonors());
+// Update the donor
+app.MapPut("/donors/{donorId}", (int donorId, Donor donor) => 
+    API_Functions.UpdateDonor(donorId, donor));
 // Delete the donor
 app.MapDelete("/donors/{donorId}", (int donorId) =>
-{
-    var api = new API_Functions();
-    var result = api.DeleteDonor(donorId);
-
-    return result.Success
-        ? Results.NoContent()
-        : Results.BadRequest(result.Message);
-});
+    API_Functions.DeleteDonor(donorId));
 // Get a campaign by ID
-app.MapGet("/campaigns/{campaignId}", (int campaignId) =>
-{
-    var api = new API_Functions();
-    var campaign = api.GetCampaignById(campaignId);
-
-    return campaign == null
-        ? Results.NotFound()
-        : Results.Ok(campaign);
-});
+app.MapGet("/campaigns/{campaignId}", (int campaignId) => 
+    API_Functions.GetCampaignById(campaignId));
 // Get a donation by ID
-app.MapGet("/donations/{donationId}", (int donationId) =>
-{
-    var api = new API_Functions();
-    var donation = api.GetDonationById(donationId);
-
-    return donation == null
-        ? Results.NotFound()
-        : Results.Ok(donation);
-});
+app.MapGet("/donations/{donationId}", (int donationId) => 
+    API_Functions.GetDonationById(donationId));
 // Get a fund distribution by ID
-app.MapGet("/fund-distributions/{distributionId}", (int distributionId) =>
-{
-    var api = new API_Functions();
-    var fundDistribution = api.GetFundDistributionById(distributionId);
-
-    return fundDistribution == null
-        ? Results.NotFound()
-        : Results.Ok(fundDistribution);
-});
+app.MapGet("/fund-distributions/{distributionId}", (int distributionId) => 
+    API_Functions.GetFundDistributionById(distributionId));
 // Get a donor by ID
-app.MapGet("/donors/{donorId}", (int donorId) =>
-{
-    var api = new API_Functions();
-    var donor = api.GetDonorById(donorId);
-
-    return donor == null
-        ? Results.NotFound()
-        : Results.Ok(donor);
-});
-// Update the campaign
-app.MapPut("/campaigns", (Campaign campaign) =>
-{
-    if (campaign == null)
-        return Results.BadRequest("Invalid campaign data");
-
-    var api = new API_Functions();
-    var result = api.UpdateCampaign(campaign);
-
-    return result.Success
-        ? Results.NoContent()
-        : Results.BadRequest(result.Message);
-});
-// Update the donation
-app.MapPut("/donations", (Donation donation) =>
-{
-    if (donation == null)
-        return Results.BadRequest("Invalid donation data");
-
-    var api = new API_Functions();
-    var result = api.UpdateDonation(donation);
-
-    return result.Success
-        ? Results.NoContent()
-        : Results.BadRequest(result.Message);
-});
-// Update the donor
-app.MapPut("/donors", (Donor donor) =>
-{
-    if (donor == null)
-        return Results.BadRequest("Invalid donor data");
-
-    var api = new API_Functions();
-    var result = api.UpdateDonor(donor);
-
-    return result.Success
-        ? Results.NoContent()
-        : Results.BadRequest(result.Message);
-});
-// Update the fund distribution
-app.MapPut("/fund-distributions", (FundDistribution fundDistribution) =>
-{
-    if (fundDistribution == null)
-        return Results.BadRequest("Invalid fund distribution data");
-
-    var api = new API_Functions();
-    var result = api.UpdateFundDistribution(fundDistribution);
-
-    return result.Success
-        ? Results.NoContent()
-        : Results.BadRequest(result.Message);
-});
+app.MapGet("/donors/{donorId}", (int donorId) => 
+    API_Functions.GetDonorById(donorId));
 // Get all donations for a campaign
-app.MapGet("/campaigns/{campaignId}/donations", (int campaignId) =>
-{
-    var api = new API_Functions();
-    var donations = api.GetDonationsForCampaign(campaignId);
-
-    return donations == null
-        ? Results.NotFound()
-        : Results.Ok(donations);
-});
+app.MapGet("/campaigns/{campaignId}/donations", (int campaignId) => 
+    API_Functions.GetDonationsForCampaign(campaignId));
 // Get all fund distributions for a campaign
-app.MapGet("/campaigns/{campaignId}/fund-distributions", (int campaignId) =>
-{
-    var api = new API_Functions();
-    var fundDistributions = api.GetFundDistributionsForCampaign(campaignId);
-
-    return fundDistributions == null
-        ? Results.NotFound()
-        : Results.Ok(fundDistributions);
-});
+app.MapGet("/campaigns/{campaignId}/fund-distributions", (int campaignId) => 
+    API_Functions.GetFundDistributionsForCampaign(campaignId));
 // all donations for a donor
-app.MapGet("/donors/{donorId}/donations", (int donorId) =>
-{
-    var api = new API_Functions();
-    var donations = api.GetDonationsForDonor(donorId);
-
-    return donations == null
-        ? Results.NotFound()
-        : Results.Ok(donations);
-});
+app.MapGet("/donors/{donorId}/donations", (int donorId) => 
+    API_Functions.GetDonationsForDonor(donorId));
 // Get all fund distributions for a beneficiary
-app.MapGet("/beneficiaries/{beneficiaryName}/fund-distributions", (string beneficiaryName) =>
-{
-    var api = new API_Functions();
-    var fundDistributions = api.GetFundDistributionsForBeneficiary(beneficiaryName);
-
-    return fundDistributions == null
-        ? Results.NotFound()
-        : Results.Ok(fundDistributions);
-});
+app.MapGet("/beneficiaries/{beneficiaryName}/fund-distributions", (string beneficiaryName) => 
+    API_Functions.GetFundDistributionsForBeneficiary(beneficiaryName));
 // Get all fund distributions for a campaign and beneficiary
-app.MapGet("/campaigns/{campaignId}/beneficiaries/{beneficiaryName}/fund-distributions", (int campaignId, string beneficiaryName) =>
-{
-    var api = new API_Functions();
-    var fundDistributions = api.GetFundDistributionsForCampaignAndBeneficiary(campaignId, beneficiaryName);
-
-    return fundDistributions == null
-        ? Results.NotFound()
-        : Results.Ok(fundDistributions);
-});
+app.MapGet("/campaigns/{campaignId}/beneficiaries/{beneficiaryName}/fund-distributions", 
+    (int campaignId, string beneficiaryName) => 
+    API_Functions.GetFundDistributionsForCampaignAndBeneficiary(campaignId, beneficiaryName));
 // Get the total amount donated for a campaign
-app.MapGet("/campaigns/{campaignId}/total-donations", (int campaignId) =>
-{
-    var api = new API_Functions();
-    var donations = api.GetDonationsForCampaign(campaignId);
-    decimal total = 0;
-
-    foreach (var donation in donations)
-    {
-        total += donation.DAmount;
-    }
-
-    return Results.Ok(total);
-});
+app.MapGet("/campaigns/{campaignId}/total-donations", (int campaignId) => 
+    API_Functions.GetTotalDonationsForCampaign(campaignId));
 // Get the total amount distributed for a campaign
-app.MapGet("/campaigns/{campaignId}/total-distributions", (int campaignId) =>
-{
-    var api = new API_Functions();
-    var fundDistributions = api.GetFundDistributionsForCampaign(campaignId);
-    decimal total = 0;
-
-    foreach (var fundDistribution in fundDistributions)
-    {
-        total += fundDistribution.FAmountDistributed;
-    }
-
-    return Results.Ok(total);
-});
+app.MapGet("/campaigns/{campaignId}/total-distributions", (int campaignId) => 
+    API_Functions.GetTotalDistributionsForCampaign(campaignId));
 // Get the total amount donated by a donor
-app.MapGet("/donors/{donorId}/total-donations", (int donorId) =>
-{
-    var api = new API_Functions();
-    var donations = api.GetDonationsForDonor(donorId);
-    decimal total = 0;
-
-    foreach (var donation in donations)
-    {
-        total += donation.DAmount;
-    }
-
-    return Results.Ok(total);
-});
+app.MapGet("/donors/{donorId}/total-donations", (int donorId) => 
+    API_Functions.GetTotalDonationsForDonor(donorId));
 // Get the total amount distributed to a beneficiary
-app.MapGet("/beneficiaries/{beneficiaryName}/total-distributions", (string beneficiaryName) =>
-{
-    var api = new API_Functions();
-    var fundDistributions = api.GetFundDistributionsForBeneficiary(beneficiaryName);
-    decimal total = 0;
-
-    foreach (var fundDistribution in fundDistributions)
-    {
-        total += fundDistribution.FAmountDistributed;
-    }
-
-    return Results.Ok(total);
-});
+app.MapGet("/beneficiaries/{beneficiaryName}/total-distributions", (string beneficiaryName) => 
+    API_Functions.GetTotalDistributionsForBeneficiary(beneficiaryName));
 // Get the total amount distributed to a beneficiary for a campaign
-app.MapGet("/campaigns/{campaignId}/beneficiaries/{beneficiaryName}/total-distributions", (int campaignId, string beneficiaryName) =>
-{
-    var api = new API_Functions();
-    var fundDistributions = api.GetFundDistributionsForCampaignAndBeneficiary(campaignId, beneficiaryName);
-    decimal total = 0;
-
-    foreach (var fundDistribution in fundDistributions)
-    {
-        total += fundDistribution.FAmountDistributed;
-    }
-
-    return Results.Ok(total);
-});
+app.MapGet("/campaigns/{campaignId}/beneficiaries/{beneficiaryName}/total-distributions", 
+    (int campaignId, string beneficiaryName) => 
+    API_Functions.GetTotalDistributionsForCampaignAndBeneficiary(campaignId, beneficiaryName));
 // Get the total amount donated for a campaign by a donor
-app.MapGet("/campaigns/{campaignId}/donors/{donorId}/total-donations", (int campaignId, int donorId) =>
-{
-    var api = new API_Functions();
-    var donations = api.GetDonationsForCampaign(campaignId);
-    decimal total = 0;
-
-    foreach (var donation in donations)
-    {
-        if (donation.DonorId == donorId)
-            total += donation.DAmount;
-    }
-
-    return Results.Ok(total);
-});
+app.MapGet("/campaigns/{campaignId}/donors/{donorId}/total-donations", 
+    (int campaignId, int donorId) => 
+    API_Functions.GetTotalDonationsForCampaignAndDonor(campaignId, donorId));
 app.Run();

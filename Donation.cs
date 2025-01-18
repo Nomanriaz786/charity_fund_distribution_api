@@ -12,7 +12,7 @@ public partial class Donation
 
     public int CampaignId { get; set; }
 
-    public DateOnly DDonationDate { get; set; }
+    public DateTime DDonationDate { get; set; }
 
     public decimal DAmount { get; set; }
 
