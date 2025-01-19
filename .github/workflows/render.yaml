@@ -1,21 +1,17 @@
-services:
-  - type: web
-    name: charity-fundraising-api
-    env: docker
-    plan: free
-    dockerfilePath: ./Dockerfile
-    envVars:
-      - key: ASPNETCORE_ENVIRONMENT
-        value: Development
-      - key: DB_SERVER
-        value: charitydb
-      - key: DB_NAME
-        value: Charity_Fundraising_DBMS
-      - key: DB_USER
-        value: sa
-      - key: DB_PASSWORD
-        value: NomANRIAZ@90
-      - key: TrustServerCertificate
-        value: true
-    healthCheckPath: /
-    autoDeploy: true
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    services:
+      charity-fundraising-api:
+        image: docker
+        env:
+          ASPNETCORE_ENVIRONMENT: Development
+          DB_SERVER: charitydb
+          DB_NAME: Charity_Fundraising_DBMS
+          DB_USER: sa
+          DB_PASSWORD: NomANRIAZ@90
+          TrustServerCertificate: true
+        options: --health-cmd "curl --fail http://localhost:80/ || exit 1" --health-interval 1m --health-timeout 10s --health-retries 3
