@@ -14,19 +14,23 @@ builder.Services.AddDbContext<CharityFundraisingDbmsContext>(options =>
         throw new InvalidOperationException("Connection string 'DefaultConnection' is not configured.");
     }
 
+    // Allow for configurable connection timeout
+    var connectionTimeout = builder.Configuration.GetValue<int>("DatabaseConnectionTimeout", 30);
+    
     connectionString = connectionString
-        .Replace("${DB_SERVER}", Environment.GetEnvironmentVariable("DB_SERVER") ?? "charitydb")
+        .Replace("${DB_SERVER}", Environment.GetEnvironmentVariable("DB_SERVER") ?? "localhost")
         .Replace("${DB_NAME}", Environment.GetEnvironmentVariable("DB_NAME") ?? "Charity_Fundraising_DBMS")
         .Replace("${DB_USER}", Environment.GetEnvironmentVariable("DB_USER") ?? "sa")
-        .Replace("${DB_PASSWORD}", Environment.GetEnvironmentVariable("DB_PASSWORD") ?? "NomANRIAZ@90");
+        .Replace("${DB_PASSWORD}", Environment.GetEnvironmentVariable("DB_PASSWORD") ?? "NomANRIAZ@90")
+        + $";Connect Timeout={connectionTimeout}";
 
     options.UseSqlServer(connectionString, sqlServerOptions =>
     {
         sqlServerOptions.EnableRetryOnFailure(
-            maxRetryCount: 10,
+            maxRetryCount: 15,
             maxRetryDelay: TimeSpan.FromSeconds(30),
             errorNumbersToAdd: null);
-        sqlServerOptions.CommandTimeout(30);
+        sqlServerOptions.CommandTimeout(60);
     });
 });
 
@@ -55,6 +59,37 @@ var app = builder.Build();
 // Initialize database before running the application
 try
 {
+    using var scope = app.Services.CreateScope();
+    var context = scope.ServiceProvider.GetRequiredService<CharityFundraisingDbmsContext>();
+    
+    app.Logger.LogInformation("Attempting to connect to database...");
+    // Try to connect to the database
+    var retryCount = 0;
+    const int maxRetries = 5;
+    
+    while (retryCount < maxRetries)
+    {
+        try
+        {
+            if (context.Database.CanConnect())
+            {
+                app.Logger.LogInformation("Successfully connected to database");
+                break;
+            }
+        }
+        catch (Exception ex)
+        {
+            retryCount++;
+            if (retryCount == maxRetries)
+            {
+                app.Logger.LogError(ex, "Failed to connect to database after {RetryCount} attempts", retryCount);
+                throw;
+            }
+            app.Logger.LogWarning("Database connection attempt {RetryCount} failed. Retrying in 5 seconds...", retryCount);
+            Thread.Sleep(5000);
+        }
+    }
+
     app.Logger.LogInformation("Initializing database...");
     DbInitializer.Initialize(app.Services);
     app.Logger.LogInformation("Database initialization completed");
