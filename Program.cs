@@ -9,14 +9,16 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<CharityFundraisingDbmsContext>(options => 
 {
     var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-    if (connectionString != null)
+    if (string.IsNullOrWhiteSpace(connectionString))
     {
-        connectionString = connectionString
-            .Replace("${DB_SERVER}", Environment.GetEnvironmentVariable("DB_SERVER") ?? "charitydb")
-            .Replace("${DB_NAME}", Environment.GetEnvironmentVariable("DB_NAME") ?? "Charity_Fundraising_DBMS")
-            .Replace("${DB_USER}", Environment.GetEnvironmentVariable("DB_USER") ?? "sa")
-            .Replace("${DB_PASSWORD}", Environment.GetEnvironmentVariable("DB_PASSWORD") ?? "NomANRIAZ@90");
+        throw new InvalidOperationException("Connection string 'DefaultConnection' is not configured.");
     }
+
+    connectionString = connectionString
+        .Replace("${DB_SERVER}", Environment.GetEnvironmentVariable("DB_SERVER") ?? "charitydb")
+        .Replace("${DB_NAME}", Environment.GetEnvironmentVariable("DB_NAME") ?? "Charity_Fundraising_DBMS")
+        .Replace("${DB_USER}", Environment.GetEnvironmentVariable("DB_USER") ?? "sa")
+        .Replace("${DB_PASSWORD}", Environment.GetEnvironmentVariable("DB_PASSWORD") ?? "NomANRIAZ@90");
 
     options.UseSqlServer(connectionString, sqlServerOptions =>
     {
