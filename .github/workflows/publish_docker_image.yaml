@@ -27,15 +27,3 @@ jobs:
         with:
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/charity-fundraising:latest
-      - name: Commit render.yaml
-        run: |
-          git config --global user.email "muhammadnomanriaz599@gmail.com"
-          git config --global user.name "Muhmmad Noman Riaz"
-          git add render.yaml
-          git commit -m "Add render.yaml for Render deployment" || echo "No changes to commit"
-
-      - name: Push changes to GitHub
-        uses: ad-m/github-push-action@v0.6.0
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          branch: main
