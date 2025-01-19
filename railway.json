@@ -2,9 +2,7 @@
     "services": [
       {
         "name": "charity-fundraising-api",
-        "build": {
-          "dockerfilePath": "./Dockerfile"
-        },
+        "image": "{{DOCKERHUB_USERNAME}}/charity-fundraising:latest",
         "deploy": {
           "command": "dotnet run"
         },
@@ -19,7 +17,7 @@
       },
       {
         "name": "charitydb",
-        "image": "mcr.microsoft.com/mssql/server",
+        "image": "mcr.microsoft.com/mssql/server:2022-latest",
         "env": {
           "ACCEPT_EULA": "Y",
           "SA_PASSWORD": "NomANRIAZ@90"
