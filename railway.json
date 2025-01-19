@@ -2,7 +2,9 @@
     "services": [
       {
         "name": "charity-fundraising-api",
-        "image": "{{DOCKERHUB_USERNAME}}/charity-fundraising:latest",
+        "build": {
+          "dockerfilePath": "./Dockerfile"
+        },
         "deploy": {
           "command": "dotnet run"
         },
