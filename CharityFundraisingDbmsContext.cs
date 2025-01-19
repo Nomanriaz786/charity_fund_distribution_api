@@ -1,18 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 
 namespace Charity_Fundraising_DBMS;
 
 public partial class CharityFundraisingDbmsContext : DbContext
 {
-    public CharityFundraisingDbmsContext()
-    {
-    }
+    private readonly IConfiguration _configuration;
 
-    public CharityFundraisingDbmsContext(DbContextOptions<CharityFundraisingDbmsContext> options)
+    public CharityFundraisingDbmsContext(DbContextOptions<CharityFundraisingDbmsContext> options, IConfiguration configuration)
         : base(options)
     {
+        _configuration = configuration;
     }
 
     public virtual DbSet<Campaign> Campaigns { get; set; }
@@ -24,8 +22,21 @@ public partial class CharityFundraisingDbmsContext : DbContext
     public virtual DbSet<FundDistribution> FundDistributions { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
-        => optionsBuilder.UseSqlServer("Data Source=(localdb)\\MSSQLLocalDB;Initial Catalog=Charity_Fundraising_DBMS");
+    {
+        if (!optionsBuilder.IsConfigured)
+        {
+            var connectionString = _configuration.GetConnectionString("DefaultConnection");
+            if (connectionString != null)
+            {
+                connectionString = connectionString
+                    .Replace("${DB_SERVER}", Environment.GetEnvironmentVariable("DB_SERVER") ?? "charitydb")
+                    .Replace("${DB_NAME}", Environment.GetEnvironmentVariable("DB_NAME") ?? "Charity_Fundraising_DBMS")
+                    .Replace("${DB_USER}", Environment.GetEnvironmentVariable("DB_USER") ?? "sa")
+                    .Replace("${DB_PASSWORD}", Environment.GetEnvironmentVariable("DB_PASSWORD") ?? "NomANRIAZ@90");
+            }
+            optionsBuilder.UseSqlServer(connectionString);
+        }
+    }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

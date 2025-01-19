@@ -1,10 +1,39 @@
 using Charity_Fundraising_DBMS;
 using Microsoft.OpenApi.Models;
 using System.Text.Json.Serialization;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Update database context configuration
+builder.Services.AddDbContext<CharityFundraisingDbmsContext>(options => 
+{
+    var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+    if (connectionString != null)
+    {
+        connectionString = connectionString
+            .Replace("${DB_SERVER}", Environment.GetEnvironmentVariable("DB_SERVER") ?? "charitydb")
+            .Replace("${DB_NAME}", Environment.GetEnvironmentVariable("DB_NAME") ?? "Charity_Fundraising_DBMS")
+            .Replace("${DB_USER}", Environment.GetEnvironmentVariable("DB_USER") ?? "sa")
+            .Replace("${DB_PASSWORD}", Environment.GetEnvironmentVariable("DB_PASSWORD") ?? "NomANRIAZ@90");
+    }
+
+    options.UseSqlServer(connectionString, sqlServerOptions =>
+    {
+        sqlServerOptions.EnableRetryOnFailure(
+            maxRetryCount: 10,
+            maxRetryDelay: TimeSpan.FromSeconds(30),
+            errorNumbersToAdd: null);
+        sqlServerOptions.CommandTimeout(30);
+    });
+});
+
+// Add services to the container
+builder.Services.AddControllers();  
 builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddRouting();    
+
+// Configure JSON options
 builder.Services.ConfigureHttpJsonOptions(options => {
     options.SerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
     options.SerializerOptions.PropertyNameCaseInsensitive = true;
@@ -21,15 +50,38 @@ builder.Services.AddSwaggerGen(c =>
 
 var app = builder.Build();
 
+// Initialize database before running the application
+try
+{
+    app.Logger.LogInformation("Initializing database...");
+    DbInitializer.Initialize(app.Services);
+    app.Logger.LogInformation("Database initialization completed");
+}
+catch (Exception ex)
+{
+    app.Logger.LogError(ex, "An error occurred while initializing the database");
+    throw;
+}
+
+// Initialize API_Functions with service provider
+API_Functions.Initialize(app.Services);
+
+// Configure the HTTP request pipeline
 if (app.Environment.IsDevelopment())
 {
-   app.UseSwagger();
-   app.UseSwaggerUI(c =>
-   {
-      c.SwaggerEndpoint("/swagger/v1/swagger.json", "Charity_Fundraising_DBMS API V1");
-   });
+    app.UseSwagger();
+    app.UseSwaggerUI(c =>
+    {
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "Charity_Fundraising_DBMS API V1");
+    });
 }
-app.MapGet("/", () => "Hello World!");
+
+// app.UseHttpsRedirection();  // Comment out or remove this line
+app.UseRouting();    
+app.UseAuthorization(); 
+app.MapControllers(); 
+
+app.MapGet("/", () => "Hello! Welcome to the Charity Fundraising DBMS API");
 
 // Display all campaigns
 app.MapGet("/campaigns", () => API_Functions.GetCampaigns());
@@ -118,4 +170,4 @@ app.MapGet("/campaigns/{campaignId}/beneficiaries/{beneficiaryName}/total-distri
 app.MapGet("/campaigns/{campaignId}/donors/{donorId}/total-donations", 
     (int campaignId, int donorId) => 
     API_Functions.GetTotalDonationsForCampaignAndDonor(campaignId, donorId));
-app.Run();
+app.Run("http://0.0.0.0:80");

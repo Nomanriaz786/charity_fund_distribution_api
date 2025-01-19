@@ -1,0 +1,21 @@
+services:
+  - type: web
+    name: charity-fundraising-api
+    env: docker
+    plan: free
+    dockerfilePath: ./Dockerfile
+    envVars:
+      - key: ASPNETCORE_ENVIRONMENT
+        value: Development
+      - key: DB_SERVER
+        value: charitydb
+      - key: DB_NAME
+        value: Charity_Fundraising_DBMS
+      - key: DB_USER
+        value: sa
+      - key: DB_PASSWORD
+        value: NomANRIAZ@90
+      - key: TrustServerCertificate
+        value: true
+    healthCheckPath: /
+    autoDeploy: true

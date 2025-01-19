@@ -1,0 +1,46 @@
+version: '3.4'
+
+networks:
+  charityapp:
+
+services:
+  charitydb:
+    container_name: charity-db
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    user: root
+    ports:
+      - "1433:1433"
+    environment:
+      - ACCEPT_EULA=Y
+      - MSSQL_SA_PASSWORD=NomANRIAZ@90
+      - MSSQL_PID=Express
+    networks:
+      - charityapp
+    volumes:
+      - sqldata:/var/opt/mssql
+    restart: unless-stopped
+
+  charity-webapi:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: ${DOCKERHUB_USERNAME}/charity-fundraising:latest
+    container_name: charity-web
+    ports:
+      - "8080:80"
+    depends_on:
+      - charitydb
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - DB_SERVER=charitydb
+      - DB_NAME=Charity_Fundraising_DBMS
+      - DB_USER=sa
+      - DB_PASSWORD=NomANRIAZ@90
+      - ConnectionRetryCount=10
+      - ConnectionRetryDelay=10
+    networks:
+      - charityapp
+    restart: unless-stopped
+
+volumes:
+  sqldata:
