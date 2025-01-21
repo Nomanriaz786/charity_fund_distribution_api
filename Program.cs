@@ -8,21 +8,14 @@ var builder = WebApplication.CreateBuilder(args);
 // Update database context configuration
 builder.Services.AddDbContext<CharityFundraisingDbmsContext>(options => 
 {
-    var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-    if (string.IsNullOrWhiteSpace(connectionString))
-    {
-        throw new InvalidOperationException("Connection string 'DefaultConnection' is not configured.");
-    }
+    var dbServer = Environment.GetEnvironmentVariable("DB_SERVER");
+    var dbName = Environment.GetEnvironmentVariable("DB_NAME");
+    var dbUser = Environment.GetEnvironmentVariable("DB_USER");
+    var dbPassword = Environment.GetEnvironmentVariable("DB_PASSWORD");
 
-    // Allow for configurable connection timeout
-    var connectionTimeout = builder.Configuration.GetValue<int>("DatabaseConnectionTimeout", 30);
+    Console.WriteLine($"Attempting to connect to database at {dbServer}");
     
-    connectionString = connectionString
-        .Replace("${DB_SERVER}", Environment.GetEnvironmentVariable("DB_SERVER") ?? "localhost")
-        .Replace("${DB_NAME}", Environment.GetEnvironmentVariable("DB_NAME") ?? "Charity_Fundraising_DBMS")
-        .Replace("${DB_USER}", Environment.GetEnvironmentVariable("DB_USER") ?? "sa")
-        .Replace("${DB_PASSWORD}", Environment.GetEnvironmentVariable("DB_PASSWORD") ?? "NomANRIAZ@90")
-        + $";Connect Timeout={connectionTimeout}";
+    var connectionString = $"Server={dbServer};Database={dbName};User Id={dbUser};Password={dbPassword};TrustServerCertificate=True;MultipleActiveResultSets=true;ConnectRetryCount=10;ConnectRetryInterval=10";
 
     options.UseSqlServer(connectionString, sqlServerOptions =>
     {
@@ -30,7 +23,7 @@ builder.Services.AddDbContext<CharityFundraisingDbmsContext>(options =>
             maxRetryCount: 15,
             maxRetryDelay: TimeSpan.FromSeconds(30),
             errorNumbersToAdd: null);
-        sqlServerOptions.CommandTimeout(60);
+        sqlServerOptions.CommandTimeout(120);
     });
 });
 
@@ -63,30 +56,33 @@ try
     var context = scope.ServiceProvider.GetRequiredService<CharityFundraisingDbmsContext>();
     
     app.Logger.LogInformation("Attempting to connect to database...");
-    // Try to connect to the database
+    
     var retryCount = 0;
-    const int maxRetries = 5;
+    const int maxRetries = 10;
+    const int retryDelay = 10000; // 10 seconds
     
     while (retryCount < maxRetries)
     {
         try
         {
-            if (context.Database.CanConnect())
-            {
-                app.Logger.LogInformation("Successfully connected to database");
-                break;
-            }
+            context.Database.OpenConnection();
+            app.Logger.LogInformation("Successfully connected to database");
+            context.Database.CloseConnection();
+            break;
         }
         catch (Exception ex)
         {
             retryCount++;
+            app.Logger.LogWarning($"Database connection attempt {retryCount} failed: {ex.Message}");
+            
             if (retryCount == maxRetries)
             {
-                app.Logger.LogError(ex, "Failed to connect to database after {RetryCount} attempts", retryCount);
+                app.Logger.LogError($"Failed to connect to database after {retryCount} attempts");
                 throw;
             }
-            app.Logger.LogWarning("Database connection attempt {RetryCount} failed. Retrying in 5 seconds...", retryCount);
-            Thread.Sleep(5000);
+            
+            app.Logger.LogInformation($"Waiting {retryDelay/1000} seconds before retry...");
+            Thread.Sleep(retryDelay);
         }
     }
 

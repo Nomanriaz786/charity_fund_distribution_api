@@ -8,7 +8,7 @@ restartPolicyType = "on_failure"
 
 [env]
 ASPNETCORE_ENVIRONMENT = "Development"
-DB_SERVER = "${{ services.charitydb.host }}"
+DB_SERVER = "${{ services.charitydb.host }}:${{ services.charitydb.port }}"
 DB_NAME = "${{ services.charitydb.database_name }}"
 DB_USER = "${{ services.charitydb.username }}"
 DB_PASSWORD = "${{ services.charitydb.password }}"
