@@ -1,22 +1,6 @@
 {
   "services": [
     {
-      "name": "charitydb",
-      "image": "mcr.microsoft.com/mssql/server:2022-latest",
-      "ports": [
-        "1433:1433"
-      ],
-      "user": "root",
-      "volumes": [
-        "sqldata:/var/opt/mssql"
-      ],
-      "env": {
-        "ACCEPT_EULA": "Y",
-        "MSSQL_SA_PASSWORD": "NomANRIAZ@90",
-        "MSSQL_PID": "Express"
-      }
-    },
-    {
       "name": "charity-fundraising-api",
       "build": {
         "dockerfilePath": "./Dockerfile"
@@ -27,13 +11,12 @@
       "ports": [
         "8080:80"
       ],
-      "depends_on": ["charitydb"],
       "env": {
         "ASPNETCORE_ENVIRONMENT": "Development",
-        "DB_SERVER": "charitydb",
-        "DB_NAME": "Charity_Fundraising_DBMS",
-        "DB_USER": "sa",
-        "DB_PASSWORD": "NomANRIAZ@90",
+        "DB_SERVER": "${{ services.charitydb.host }}",
+        "DB_NAME": "${{ services.charitydb.database_name }}",
+        "DB_USER": "${{ services.charitydb.username }}",
+        "DB_PASSWORD": "${{ services.charitydb.password }}",
         "TrustServerCertificate": "true",
         "ConnectionRetryCount": "10",
         "ConnectionRetryDelay": "10"
