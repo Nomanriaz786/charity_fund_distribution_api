@@ -6,16 +6,14 @@
       "ports": [
         "1433:1433"
       ],
-      "healthcheck": {
-        "test": "/opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P \"${SA_PASSWORD}\" -Q 'SELECT 1' || exit 1",
-        "interval": "10s",
-        "timeout": "5s",
-        "retries": 5,
-        "start_period": "20s"
-      },
+      "user": "root",
+      "volumes": [
+        "sqldata:/var/opt/mssql"
+      ],
       "env": {
         "ACCEPT_EULA": "Y",
-        "SA_PASSWORD": "NomANRIAZ@90"
+        "MSSQL_SA_PASSWORD": "NomANRIAZ@90",
+        "MSSQL_PID": "Express"
       }
     },
     {
@@ -26,19 +24,23 @@
       "deploy": {
         "command": "dotnet run"
       },
-      "depends_on": {
-        "charitydb": {
-          "condition": "service_healthy"
-        }
-      },
+      "ports": [
+        "8080:80"
+      ],
+      "depends_on": ["charitydb"],
       "env": {
         "ASPNETCORE_ENVIRONMENT": "Development",
         "DB_SERVER": "charitydb",
         "DB_NAME": "Charity_Fundraising_DBMS",
         "DB_USER": "sa",
         "DB_PASSWORD": "NomANRIAZ@90",
-        "TrustServerCertificate": "true"
+        "TrustServerCertificate": "true",
+        "ConnectionRetryCount": "10",
+        "ConnectionRetryDelay": "10"
       }
     }
-  ]
+  ],
+  "volumes": {
+    "sqldata": {}
+  }
 }
