@@ -37,8 +37,7 @@ builder.Services.AddDbContext<CharityFundraisingDbmsContext>(options =>
 // Add services to the container
 builder.Services.AddControllers();  
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddRouting();    
-builder.Services.AddHealthChecks(); // Add health check service
+builder.Services.AddRouting();
 
 // Configure JSON options
 builder.Services.ConfigureHttpJsonOptions(options => {
@@ -209,6 +208,5 @@ app.MapGet("/campaigns/{campaignId}/donors/{donorId}/total-donations",
     (int campaignId, int donorId) => 
     API_Functions.GetTotalDonationsForCampaignAndDonor(campaignId, donorId));
 
-app.MapHealthChecks("/health"); // Add health check endpoint
 
 app.Run("http://0.0.0.0:80");
