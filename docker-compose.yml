@@ -6,7 +6,9 @@ networks:
 services:
   charitydb:
     container_name: charity-db
-    image: mcr.microsoft.com/mssql/server:2022-latest
+    build:
+      context: .
+      dockerfile: Dockerfile.db
     user: "10001:10001"
     ports:
       - "1433:1433"
@@ -24,7 +26,7 @@ services:
   charity-webapi:
     build:
       context: . 
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.web
     image: ${DOCKERHUB_USERNAME}/charity-fundraising:latest
     container_name: charity-web
     ports:
