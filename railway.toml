@@ -1,0 +1,23 @@
+[build]
+builder = "dockerfile"
+dockerfilePath = "Dockerfile"
+
+[deploy]
+startCommand = "dotnet Charity_Fundraising_DBMS.dll"
+healthcheckPath = "/health"
+restartPolicyType = "on_failure"
+
+[env]
+ASPNETCORE_ENVIRONMENT = "Development"
+DB_SERVER = "${{ services.charitydb.host }}"
+DB_NAME = "Charity_Fundraising_DBMS"
+DB_USER = "sa"
+DB_PASSWORD = "NomANRIAZ@90"
+TrustServerCertificate = "true"
+ConnectionRetryCount = "10"
+ConnectionRetryDelay = "10"
+
+[[services]]
+name = "charitydb"
+type = "mssql"
+plan = "free"
