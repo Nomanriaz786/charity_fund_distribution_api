@@ -1,6 +1,14 @@
 {
   "services": [
     {
+      "name": "charitydb",
+      "image": "mcr.microsoft.com/mssql/server:2022-latest",
+      "env": {
+        "ACCEPT_EULA": "Y",
+        "SA_PASSWORD": "NomANRIAZ@90"
+      }
+    },
+    {
       "name": "charity-fundraising-api",
       "build": {
         "dockerfilePath": "./Dockerfile"
@@ -8,6 +16,7 @@
       "deploy": {
         "command": "dotnet run"
       },
+      "depends_on": ["charitydb"],
       "env": {
         "ASPNETCORE_ENVIRONMENT": "Development",
         "DB_SERVER": "charitydb",
@@ -15,14 +24,6 @@
         "DB_USER": "sa",
         "DB_PASSWORD": "NomANRIAZ@90",
         "TrustServerCertificate": "true"
-      }
-    },
-    {
-      "name": "charitydb",
-      "image": "mcr.microsoft.com/mssql/server:2022-latest",
-      "env": {
-        "ACCEPT_EULA": "Y",
-        "SA_PASSWORD": "NomANRIAZ@90"
       }
     }
   ]
