@@ -4,6 +4,7 @@ dockerfilePath = "Dockerfile"
 
 [deploy]
 startCommand = "dotnet Charity_Fundraising_DBMS.dll"
+restartPolicyType = "on_failure"
 
 [env]
 ASPNETCORE_ENVIRONMENT = "Development"
