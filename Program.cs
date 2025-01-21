@@ -115,7 +115,8 @@ app.UseAuthorization();
 app.MapControllers(); 
 
 app.MapGet("/", () => "Hello! Welcome to the Charity Fundraising DBMS API");
-
+// Add the /about route
+app.MapGet("/about", () => "Project: Charity Fundraising DBMS\nDeveloper: Muhammad Noman Riaz\nRollno: 21-ARID-4010\nDate: 2024-01-21\nVersion: 1.0.0\nDescription: This API provides endpoints for managing campaigns, donations, fund distributions, donors, and beneficiaries for a charity fundraising database management system.");
 // Display all campaigns
 app.MapGet("/campaigns", () => API_Functions.GetCampaigns());
 // Add a campaign
