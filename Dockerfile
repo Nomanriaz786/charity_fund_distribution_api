@@ -17,3 +17,22 @@ COPY --from=build /App/out .
 EXPOSE 80
 
 ENTRYPOINT ["dotnet", "Charity_Fundraising_DBMS.dll"]
+
+FROM mcr.microsoft.com/mssql/server:2022-latest
+
+# Create non-root user for SQL Server
+USER root
+RUN useradd -M -s /bin/bash -u 10001 mssql
+
+# Set up directories and permissions
+RUN mkdir -p /var/opt/mssql && \
+    chown -R mssql:mssql /var/opt/mssql
+
+# Switch to mssql user
+USER mssql
+
+ENV ACCEPT_EULA=Y
+ENV SA_PASSWORD=YourSecurePassword123!
+ENV MSSQL_PID=Express
+
+EXPOSE 1433
