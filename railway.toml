@@ -5,7 +5,9 @@ dockerfilePath = "Dockerfile"
 [deploy]
 startCommand = "dotnet Charity_Fundraising_DBMS.dll"
 healthcheckPath = "/health"
+healthcheckTimeout = "30s"
 restartPolicyType = "on_failure"
+healthcheckInterval = "15s"
 
 [env]
 ASPNETCORE_ENVIRONMENT = "Development"
