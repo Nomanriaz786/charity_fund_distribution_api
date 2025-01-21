@@ -1,8 +1,0 @@
-FROM mcr.microsoft.com/mssql/server:2022-latest
-
-USER mssql
-ENV ACCEPT_EULA=Y
-ENV SA_PASSWORD=YourSecurePassword123!
-ENV MSSQL_PID=Express
-
-EXPOSE 1433

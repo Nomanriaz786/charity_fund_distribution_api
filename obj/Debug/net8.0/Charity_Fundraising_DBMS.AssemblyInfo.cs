@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Charity_Fundraising_DBMS")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+e6e939419eeda4ab445743311899eed67a4fe043")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+f3b2088a111f91fb3d6c2c00cca589d6d9215310")]
 [assembly: System.Reflection.AssemblyProductAttribute("Charity_Fundraising_DBMS")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Charity_Fundraising_DBMS")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

@@ -1,32 +1,27 @@
-version: '3.8'
-
 networks:
   charityapp:
 
 services:
   charitydb:
     container_name: charity-db
-    build:
-      context: .
-      dockerfile: Dockerfile.db
-    user: "10001:10001"
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    user: root
     ports:
       - "1433:1433"
     environment:
       - ACCEPT_EULA=Y
-      - SA_PASSWORD=YourSecurePassword123!
+      - MSSQL_SA_PASSWORD=NomANRIAZ@90
       - MSSQL_PID=Express
-      - MSSQL_USER=mssql
     networks:
       - charityapp
     volumes:
-      - db-data:/var/opt/mssql
+      - sqldata:/var/opt/mssql
     restart: unless-stopped
 
   charity-webapi:
     build:
-      context: . 
-      dockerfile: Dockerfile.web
+      context: .
+      dockerfile: Dockerfile
     image: ${DOCKERHUB_USERNAME}/charity-fundraising:latest
     container_name: charity-web
     ports:
@@ -38,13 +33,12 @@ services:
       - DB_SERVER=charitydb
       - DB_NAME=Charity_Fundraising_DBMS
       - DB_USER=sa
-      - DB_PASSWORD=YourSecurePassword123!
+      - DB_PASSWORD=NomANRIAZ@90
       - ConnectionRetryCount=10
       - ConnectionRetryDelay=10
-      - ConnectionStrings__DefaultConnection=Server=charity-db;Database=Charity_Fundraising_DBMS;User Id=sa;Password=YourSecurePassword123!;TrustServerCertificate=True;
     networks:
       - charityapp
     restart: unless-stopped
 
 volumes:
-  db-data:
+  sqldata:
