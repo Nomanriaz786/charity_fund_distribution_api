@@ -528,13 +528,13 @@ public static class API_Functions
         }
     }
     // Display the name and phone number of the donor who gives donations greater 1000
-    public static IResult ? GetDonorsWithHighDonations()
+    public static IResult ? GetDonorsWithHighDonations(int amount)
     {
         try
         {
             using var context = GetContext();
             var donors = context.Donations
-                .Where(d => d.DAmount > 1000)
+                .Where(d => d.DAmount > amount)
                 .Select(d => d.Donor != null ? new { d.Donor.DName, PhoneNumber = d.Donor.DPhone ?? "N/A" } : null)
                 .Where(d => d != null)
                 .ToList();
