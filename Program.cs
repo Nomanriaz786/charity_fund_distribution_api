@@ -204,6 +204,8 @@ app.MapGet("/campaigns/{campaignId}/beneficiaries/{beneficiaryName}/total-distri
 app.MapGet("/campaigns/{campaignId}/donors/{donorId}/total-donations", 
     (int campaignId, int donorId) => 
     API_Functions.GetTotalDonationsForCampaignAndDonor(campaignId, donorId));
+// Display the name and phone number of the donor who gives donations greater 1000
+app.MapGet("/donations/greaterthan100", () => API_Functions.GetDonorsWithHighDonations());
 
 
 app.Run("http://0.0.0.0:80");
