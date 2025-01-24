@@ -16,6 +16,14 @@ services:
       - charityapp
     volumes:
       - sqldata:/var/opt/mssql
+      - ./init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
+    command: >
+      bash -c "
+        /opt/mssql/bin/sqlservr &
+        sleep 30
+        /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P NomANRIAZ@90 -i /docker-entrypoint-initdb.d/init-db.sql
+        wait
+      "
     restart: unless-stopped
 
   charity-webapi:

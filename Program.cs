@@ -58,16 +58,16 @@ try
     app.Logger.LogInformation("Attempting to connect to database...");
     
     var retryCount = 0;
-    const int maxRetries = 10;
+    const int maxRetries = 30; // Increased retry count
     const int retryDelay = 10000; // 10 seconds
     
     while (retryCount < maxRetries)
     {
         try
         {
-            context.Database.OpenConnection();
+            // Try to create the database if it doesn't exist
+            context.Database.EnsureCreated();
             app.Logger.LogInformation("Successfully connected to database");
-            context.Database.CloseConnection();
             break;
         }
         catch (Exception ex)
