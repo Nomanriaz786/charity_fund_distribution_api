@@ -527,14 +527,15 @@ public static class API_Functions
             return Results.BadRequest($"Failed to get total donations: {ex.Message}");
         }
     }
-    // Display the name and phone number of the donor who gives donations greater 1000
-    public static IResult ? GetDonorsWithHighDonations(int amount)
+    // Display the name and phone number of the donor who gives donations greater than 1000
+    public static IResult GetDonorsWithHighDonations(int amount)
     {
         try
         {
             using var context = GetContext();
             var donors = context.Donations
                 .Where(d => d.DAmount > amount)
+                .ToList() // Switch to client-side evaluation
                 .Select(d => d.Donor != null ? new { d.Donor.DName, PhoneNumber = d.Donor.DPhone ?? "N/A" } : null)
                 .Where(d => d != null)
                 .ToList();
