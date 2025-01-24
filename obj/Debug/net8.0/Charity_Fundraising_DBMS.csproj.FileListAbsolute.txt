@@ -194,3 +194,6 @@ C:\Users\User\Charity_Fundraising_DBMS\obj\Debug\net8.0\Charity_Fundraising_DBMS
 C:\Users\User\Charity_Fundraising_DBMS\obj\Debug\net8.0\ref\Charity_Fundraising_DBMS.dll
 C:\Users\User\Charity_Fundraising_DBMS\bin\Debug\net8.0\Microsoft.AspNetCore.OpenApi.dll
 C:\Users\User\Charity_Fundraising_DBMS\obj\Debug\net8.0\Charity_Fundraising_DBMS.sourcelink.json
+C:\Users\User\Charity_Fundraising_DBMS\bin\Debug\net8.0\Charity_Fundraising_DBMS.staticwebassets.endpoints.json
+C:\Users\User\Charity_Fundraising_DBMS\obj\Debug\net8.0\staticwebassets.build.endpoints.json
+C:\Users\User\Charity_Fundraising_DBMS\obj\Debug\net8.0\staticwebassets\msbuild.Charity_Fundraising_DBMS.Microsoft.AspNetCore.StaticWebAssetEndpoints.props

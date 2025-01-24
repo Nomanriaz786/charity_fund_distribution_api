@@ -1,11 +1,12 @@
 {
   "Version": 1,
-  "Hash": "V+ts/4qUS5hlgKWDH8Y80Tb00ak/hXfX+qZCUemtM+4=",
+  "Hash": "zUSUpvw84KTAKakDxdYcPdO1D5/2lD7xxgi+e9jMdhU=",
   "Source": "Charity_Fundraising_DBMS",
   "BasePath": "_content/Charity_Fundraising_DBMS",
   "Mode": "Default",
   "ManifestType": "Build",
   "ReferencedProjectsConfiguration": [],
   "DiscoveryPatterns": [],
-  "Assets": []
+  "Assets": [],
+  "Endpoints": []
 }
